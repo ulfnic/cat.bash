@@ -5,27 +5,32 @@ cat.bash() {
 	# cat.bash [FILE]...
 	#
 	# DESCRIPTION
-	#   Concatenate FILE(s) to stdout in pure BASH without use of cat.
+	#   Concatenate FILE(s) to stdout in native BASH without use of cat.
 	#
 	#   With no FILE, or when FILE is -, read standard input.
-	#
-	# TRAILING $'\0' NULL CHARACTER LIMITATION
-	#   If an input ends in a null character, it's trimmed from it's output.
-	#   (see README.md)
 
-	local MAPFILE MAPFILE_len
+	local LANG=C REPLY
 
 
 	print_pipe() {
-		# Read from stdin into an array deliminated by null characters
-		readarray -d ''
+		# Writes the contents of stdin to stdout.
 
-		# Print portion of stdin that was before the first null character
-		printf '%s' "${MAPFILE[0]}"
+		# stdin is read in null character deliminated chunks.
 
-		# Print portion of stdin that contained null characters
-		MAPFILE_len=${#MAPFILE[@]}
-		[[ $MAPFILE_len == 1 ]] || printf '\0%s' "${MAPFILE[@]:1:MAPFILE_len-1}"
+		# Each successful read prints the contents of stdin up to the first null character followed
+		# by a null character to represent the one squashed as the deliminator.
+
+		# Read fails when encountering an EOF. Everything read since the last null character (or
+		# beginning of stdin if there weren't any) is printed and the read loop is broken.
+
+		while :; do
+			if IFS= read -r -d ''; then
+				printf '%s\0' "$REPLY"
+				continue
+			fi
+			printf '%s' "$REPLY"
+			break
+		done
 	}
 
 
