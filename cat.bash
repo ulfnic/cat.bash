@@ -9,8 +9,6 @@ cat.bash() {
 	#
 	#   With no FILE, or when FILE is -, read standard input.
 
-	local LANG=C REPLY
-
 
 	print_pipe() {
 		# Writes the contents of stdin to stdout.
@@ -21,16 +19,13 @@ cat.bash() {
 		# by a null character to represent the one squashed as the deliminator.
 
 		# Read fails when encountering an EOF. Everything read since the last null character (or
-		# beginning of stdin if there weren't any) is printed and the read loop is broken.
+		# beginning of stdin if there weren't any) is printed after the read loop ends.
 
-		while :; do
-			if IFS= read -r -d ''; then
-				printf '%s\0' "$REPLY"
-				continue
-			fi
-			printf '%s' "$REPLY"
-			break
+		local LANG=C IFS REPLY
+		while read -r -d ''; do
+			printf '%s\0' "$REPLY"
 		done
+		printf '%s' "$REPLY"
 	}
 
 
