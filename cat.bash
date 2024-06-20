@@ -29,31 +29,43 @@ cat.bash() {
 	}
 
 
-	# Hande args
+	# If no args, read from stdin
 	if [[ ${#@} == '0' ]]; then
-		print_pipe || return $?
-	else
-		while [[ $1 ]]; do
-			if [[ $1 == '--' ]]; then
-				shift; break
-			elif [[ $1 == '-' ]]; then
-				print_pipe || return $?
-			else
-				print_pipe < "$1" || return $?
-			fi
-			shift
-		done
-		while [[ $1 ]]; do
-			print_pipe < "$1" || return $?
-			shift
-		done
+		print_pipe
+		return $?
 	fi
+
+
+	# Hande args
+	while [[ $1 ]]; do
+		if [[ $1 == '--' ]]; then
+			shift
+			break
+		fi
+
+		if [[ $1 == '-' ]]; then
+			print_pipe || return $?
+		else
+			print_pipe < "$1" || return $?
+		fi
+
+		shift
+	done
+
+
+	# Hande remaining args as files
+	while [[ $1 ]]; do
+		print_pipe < "$1" || return $?
+		shift
+	done
+
+
+	return 0
 }
 
 
 
 # If not sourced, call function
 [[ ${BASH_SOURCE[0]} == "$0" ]] && cat.bash "$@"
-
 
 
