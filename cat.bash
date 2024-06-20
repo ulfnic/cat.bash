@@ -11,15 +11,15 @@ cat.bash() {
 
 
 	print_pipe() {
-		# Writes the contents of stdin to stdout.
+		# Writes the contents of stdin to stdout in null character deliminated chunks.
 
-		# stdin is read in null character deliminated chunks.
+		# If the `read` command succeeds it means it read a null character.
+		# Contents of what was read is written to stdout followed by a null character
+		# to represent the one squashed as the deliminator.
 
-		# Each successful read prints the contents of stdin up to the first null character followed
-		# by a null character to represent the one squashed as the deliminator.
-
-		# Read fails when encountering an EOF. Everything read since the last null character (or
-		# beginning of stdin if there weren't any) is printed after the read loop ends.
+		# If the `read` command fails it means it didn't read a null character
+		# before encountering EOF. The loop is broken and the all characters
+		# read up to that point are written to stdout.
 
 		local LANG=C IFS REPLY
 		while read -r -d ''; do
