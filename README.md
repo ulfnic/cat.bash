@@ -43,7 +43,3 @@ Copying null characters:
   printf '\0\0\0null\0\0\0characters\0\0\0' | cat.bash | sed 's/\o0/\\0/g'
 # stdout: \0\0\0null\0\0\0characters\0\0\0
 ```
-
-## License
-
-Licensed under Creative Commons, CC0 1.0 Universal. See LICENSE for details.
